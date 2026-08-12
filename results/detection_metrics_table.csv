@@ -1,0 +1,5 @@
+Model,Accuracy (%),Precision (%),Recall (%),F1-Score (%),FPR (%)
+Isolation Forest,96.0,83.82,100.0,91.2,5.05
+One-Class SVM,95.68,82.75,100.0,90.56,5.45
+Autoencoder,96.0,83.82,100.0,91.2,5.05
+Ensemble (Proposed),96.84,86.77,100.0,92.91,3.99

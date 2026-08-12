@@ -1,0 +1,4 @@
+configuration,accuracy,fpr,avg_latency_per_alert_sec
+Detection Only,96.84,3.99,4e-05
+Detection + XAI,96.84,3.99,0.00334
+Full Pipeline (+MITRE),96.84,3.99,0.00369

@@ -1,0 +1,6 @@
+metric,mean_pct,std_dev_pct
+accuracy,94.64,1.76
+precision,79.73,5.33
+recall,100.0,0.0
+f1,88.65,3.32
+fpr,6.76,2.21
