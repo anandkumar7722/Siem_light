@@ -27,9 +27,9 @@ def generate_llm_explanation(alert_data):
     LIME Top Features (Local Boundary Weight): {', '.join(lime_top)}
     
     Provide a concise 3-paragraph summary:
-    1. Incident Overview & Threat Context
-    2. Combined XAI Analysis (What SHAP & LIME indicate about network behavior)
-    3. Recommended SOC Analyst Action
+    1. Threat Overview
+    2. XAI Analysis
+    3. Recommended Action
     """
 
     if api_key:
@@ -54,17 +54,18 @@ def generate_llm_explanation(alert_data):
     lime_primary = alert_data.get('lime_feat_1', 'Traffic Pattern')
     
     narrative = f"""
-### 🤖 AI Analyst Copilot Summary
+### 🤖 AI Analyst Summary
 
 **1. Threat Overview:**  
 Alert #{alert_data.get('alert_id')} triggered a **{alert_data.get('severity')}** severity alert for **{alert_data.get('label')}** with an ensemble anomaly score of **{alert_data.get('anomaly_score')}**. Mapped to MITRE ATT&CK **{alert_data.get('mitre_technique')}** ({alert_data.get('mitre_tactic')}).
 
-**2. Combined XAI Analysis (SHAP + LIME Consensus):**  
+**2. XAI Analysis:**  
 - **SHAP (Global Attribution):** Identifies `{shap_primary}` as the primary feature driving the baseline network model away from normal benign traffic.
 - **LIME (Local Boundary):** Indicates `{lime_primary}` as the strongest local decision boundary weight confirming attack classification.
 - **Consensus Assessment:** Dual alignment between global model attributions and local surrogate weights confirms high-confidence anomaly classification, ruling out random packet noise.
 
-**3. Recommended SOC Analyst Action:**  
+**3. Recommended Action:**  
 Isolate host IP `{alert_data.get('source_ip')}`, inspect flow logs around `{alert_data.get('timestamp')}`, and verify firewall filtering rules for `{alert_data.get('destination_ip')}`.
 """
     return narrative
+
