@@ -1,7 +1,12 @@
+import sys
+import os
+
+# Ensure workspace root is in sys.path when running from subdirectories or containers
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
 import json
 from streamlit_autorefresh import st_autorefresh
 from src.llm_explainer import generate_llm_explanation

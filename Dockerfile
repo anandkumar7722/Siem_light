@@ -5,9 +5,10 @@
 
 FROM python:3.10-slim
 
-# Prevent Python from writing .pyc files and enable unbuffered output
+# Prevent Python from writing .pyc files, enable unbuffered output, and set PYTHONPATH
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/app" \
     DEBIAN_FRONTEND=noninteractive
 
 # Set container working directory
