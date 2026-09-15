@@ -23,7 +23,50 @@ A lightweight, CPU-efficient, explainable Security Information and Event Managem
 
 ---
 
-## 🚀 Step-by-Step Instructions
+## 🐳 Quick Start with Docker (Run Anywhere in 1 Step)
+
+The easiest way to run the entire project on any operating system (Windows, macOS, Linux) without configuring Python environments:
+
+### Option A: Using Docker Compose (Recommended)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/anandkumar7722/Siem_light.git
+cd Siem_light
+
+# 2. Build and launch the container
+docker compose up -d
+```
+
+Open **[http://localhost:8501](http://localhost:8501)** in your browser!
+
+*(Optional)* To also run the real-time event streaming simulator in Docker:
+```bash
+docker compose --profile stream up -d
+```
+
+To stop the containers:
+```bash
+docker compose down
+```
+
+---
+
+### Option B: Using Standalone Docker Commands
+
+```bash
+# Build the Docker image
+docker build -t siem_light .
+
+# Run the container
+docker run -d -p 8501:8501 --name siem_dashboard siem_light
+```
+
+Access the dashboard at **[http://localhost:8501](http://localhost:8501)**.
+
+---
+
+## 💻 Manual Setup Instructions (Local Python Environment)
 
 ### Step 1: Clone the Repository
 Open your terminal / PowerShell and clone the project:
@@ -37,7 +80,7 @@ cd Siem_light
 
 ### Step 2: Set Up a Virtual Environment (Recommended)
 
-Create and activate a isolated Python virtual environment:
+Create and activate an isolated Python virtual environment:
 
 #### **On Windows (PowerShell):**
 ```powershell
@@ -67,7 +110,7 @@ pip install -r requirements.txt
 ### Step 4: Run the Main Detection & Explanation Pipeline
 
 Run the primary offline pipeline (`main.py`). This script will:
-1. Generate or load synthetic CICIDS2017 flow datasets.
+1. Generate synthetic multi-class threat flow datasets.
 2. Train the ensemble detectors (Isolation Forest, One-Class SVM, Autoencoder).
 3. Compute SHAP explanations and MITRE ATT&CK mappings.
 4. Output evaluated alerts to `data/processed/alerts.csv`.

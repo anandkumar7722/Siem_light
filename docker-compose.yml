@@ -1,0 +1,37 @@
+services:
+  # Main SOC Threat Detection & XAI Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: siem_light_dashboard
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./results:/app/results
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - PYTHONUNBUFFERED=1
+      # Optional: Add your OpenAI API key here if you want LLM live synthesis
+      # - OPENAI_API_KEY=your-api-key-here
+
+  # Optional Real-Time Streaming Simulator
+  stream-simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: siem_light_streamer
+    restart: "no"
+    depends_on:
+      - dashboard
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./results:/app/results
+    entrypoint: ["python", "-m", "src.stream_simulator"]
+    profiles:
+      - stream

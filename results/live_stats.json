@@ -1,11 +1,11 @@
 {
-  "total_alerts": 25,
-  "engine_fpr_pct": 4.35,
+  "total_alerts": 75,
+  "engine_fpr_pct": 5.53,
   "severity_counts": {
     "Low": 0,
-    "Medium": 1,
-    "High": 3,
-    "Critical": 21
+    "Medium": 2,
+    "High": 11,
+    "Critical": 62
   },
-  "last_updated": "2026-09-15 12:24:20"
+  "last_updated": "2026-09-15 12:46:27"
 }
