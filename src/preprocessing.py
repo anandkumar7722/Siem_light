@@ -35,8 +35,12 @@ def prepare_dataset(wednesday_path, scaler_path='models/scaler.pkl'):
 
 def generate_mock_datasets(monday_path='data/raw/Monday-WorkingHours.pcap_ISCX.csv',
                            wednesday_path='data/raw/Wednesday-workingHours.pcap_ISCX.csv',
-                           num_samples=2000):
+                           num_samples=2000,
+                           force=False):
     """Generates synthetic mock datasets matching CICIDS2017 format for instant pipeline testing."""
+    if not force and os.path.exists(monday_path) and os.path.exists(wednesday_path):
+        return
+
     os.makedirs(os.path.dirname(monday_path), exist_ok=True)
     os.makedirs(os.path.dirname(wednesday_path), exist_ok=True)
 
@@ -63,22 +67,58 @@ def generate_mock_datasets(monday_path='data/raw/Monday-WorkingHours.pcap_ISCX.c
     df_monday = pd.DataFrame(monday_data, columns=all_cols)
     df_monday.to_csv(monday_path, index=False)
 
-    # Wednesday dataset (80% Benign, 20% DoS variants)
-    attack_types = ["DoS Hulk", "DoS GoldenEye", "DoS Slowloris", "DoS Slowhttptest"]
+    # Wednesday dataset (75% Benign, 25% Multi-Class Threat Attacks)
+    attack_types = [
+        "DoS Hulk", "DoS GoldenEye", "DoS Slowloris", "DoS Slowhttptest",
+        "PortScan", "FTP-Patator", "SSH-Patator",
+        "Web Attack - SQL Injection", "Web Attack - XSS", "Bot", "Infiltration"
+    ]
     wednesday_data = []
     for i in range(num_samples):
-        is_attack = np.random.rand() < 0.20
+        is_attack = np.random.rand() < 0.25
         if is_attack:
             label = np.random.choice(attack_types)
-            row = [f"FLOW_WED_{i}", "172.16.0.1", "192.168.1.50", "2026-07-27 10:00:00", label]
-            # Anomalous feature distribution
-            feats = np.random.normal(loc=50.0, scale=15.0, size=len(feature_names)).tolist()
+            src_ip = f"172.16.0.{np.random.randint(1, 100)}" if "Patator" in label or "Web" in label or "PortScan" in label else "172.16.0.1"
+            row = [f"FLOW_WED_{i}", src_ip, "192.168.1.50", "2026-07-27 10:00:00", label]
+            
+            # Signature-specific feature distributions matching attack characteristics
+            if "PortScan" in label:
+                feats = np.random.normal(loc=25.0, scale=8.0, size=len(feature_names))
+                feats[0] = np.random.choice([21, 22, 80, 443, 8080, 3389]) # Destination Port
+                feats[1] = np.random.normal(5.0, 1.0)                      # Short Flow Duration
+                feats[15] = np.random.normal(120.0, 25.0)                  # High Flow Packets/s
+            elif "Patator" in label:
+                feats = np.random.normal(loc=40.0, scale=10.0, size=len(feature_names))
+                feats[0] = 21 if "FTP" in label else 22                   # FTP / SSH ports
+                feats[3] = np.random.normal(85.0, 15.0)                    # High Total Backward Packets
+                feats[13] = np.random.normal(45.0, 10.0)                   # Bwd Packet Length Std
+            elif "Web Attack" in label:
+                feats = np.random.normal(loc=35.0, scale=12.0, size=len(feature_names))
+                feats[0] = 80                                             # HTTP Port
+                feats[4] = np.random.normal(250.0, 50.0)                   # High Total Length of Fwd Packets (SQLi/XSS payload)
+                feats[6] = np.random.normal(180.0, 30.0)                   # Fwd Packet Length Max
+            elif "Bot" in label:
+                feats = np.random.normal(loc=60.0, scale=15.0, size=len(feature_names))
+                feats[1] = np.random.normal(300.0, 50.0)                   # Long Flow Duration C2
+                feats[20] = np.random.normal(280.0, 40.0)                  # High Fwd IAT Total
+                feats[14] = np.random.normal(150.0, 30.0)                  # Flow Bytes/s
+            elif "Infiltration" in label:
+                feats = np.random.normal(loc=55.0, scale=14.0, size=len(feature_names))
+                feats[5] = np.random.normal(400.0, 80.0)                   # High Total Length of Bwd Packets (Exfiltration)
+                feats[10] = np.random.normal(220.0, 40.0)                  # Bwd Packet Length Max
+            else: # DoS variants
+                feats = np.random.normal(loc=50.0, scale=15.0, size=len(feature_names))
+                feats[1] = np.random.normal(150.0, 30.0)                   # Flow Duration
+                feats[16] = np.random.normal(80.0, 15.0)                   # Flow IAT Mean
+
+            wednesday_data.append(row + feats.tolist())
         else:
             label = "BENIGN"
             row = [f"FLOW_WED_{i}", "192.168.1.12", "192.168.1.50", "2026-07-27 10:00:00", label]
             feats = np.random.normal(loc=10.0, scale=2.0, size=len(feature_names)).tolist()
-        wednesday_data.append(row + feats)
+            wednesday_data.append(row + feats)
 
     df_wednesday = pd.DataFrame(wednesday_data, columns=all_cols)
     df_wednesday.to_csv(wednesday_path, index=False)
     print(f"Generated mock datasets at {monday_path} and {wednesday_path}")
+

@@ -23,9 +23,8 @@ def main():
     monitor.start_timer()
 
     # Step 1: Ensure datasets exist (generate synthetic mock if not downloaded yet)
-    if not os.path.exists(monday_path) or not os.path.exists(wednesday_path):
-        print("\n[Module 1] Raw dataset CSVs not found. Generating mock CICIDS2017 datasets...")
-        generate_mock_datasets(monday_path, wednesday_path, num_samples=2500)
+    print("\n[Module 1] Preparing multi-class threat flow datasets (DoS, Recon, Brute Force, Web, Bot, Infiltration)...")
+    generate_mock_datasets(monday_path, wednesday_path, num_samples=2500, force=True)
 
     # Step 2: Fit Scaler ONLY on Benign Monday Data (prevents data leakage)
     print("\n[Module 1] Building StandardScaler on benign Monday dataset...")
@@ -89,7 +88,7 @@ def main():
             'source_ip': df.iloc[idx].get('Source IP', '172.16.0.1'),
             'destination_ip': df.iloc[idx].get('Destination IP', '192.168.1.50'),
             'label': actual_label,
-            'severity': 'Critical' if 'DoS' in str(actual_label) else 'High',
+            'severity': 'Critical' if ('DoS' in str(actual_label) or 'Bot' in str(actual_label)) else ('Medium' if 'PortScan' in str(actual_label) else 'High'),
             'mitre_tactic': mitre_info['tactic'],
             'mitre_technique': mitre_info['technique'],
             'mitre_conf': mitre_info['conf']

@@ -3,14 +3,40 @@ from sklearn.ensemble import RandomForestClassifier
 
 # Simplified rule table mapping known flow signatures to MITRE ATT&CK TTPs
 MITRE_RULES = {
-    "DoS Hulk":         {"tactic": "TA0040 Impact", "technique": "T1498.001", "conf": 94.0},
-    "DoS GoldenEye":    {"tactic": "TA0040 Impact", "technique": "T1498/T1499", "conf": 93.5},
-    "DoS Slowloris":    {"tactic": "TA0040 Impact", "technique": "T1499", "conf": 91.2},
-    "DoS Slowhttptest": {"tactic": "TA0040 Impact", "technique": "T1499", "conf": 90.8},
-    "Hulk":             {"tactic": "TA0040 Impact", "technique": "T1498.001", "conf": 94.0},
-    "GoldenEye":        {"tactic": "TA0040 Impact", "technique": "T1498/T1499", "conf": 93.5},
-    "Slowloris":        {"tactic": "TA0040 Impact", "technique": "T1499", "conf": 91.2},
-    "Slowhttptest":     {"tactic": "TA0040 Impact", "technique": "T1499", "conf": 90.8},
+    # DoS / Impact (TA0040)
+    "DoS Hulk":                 {"tactic": "TA0040 Impact", "technique": "T1498.001", "conf": 94.0},
+    "DoS GoldenEye":            {"tactic": "TA0040 Impact", "technique": "T1498/T1499", "conf": 93.5},
+    "DoS Slowloris":            {"tactic": "TA0040 Impact", "technique": "T1499", "conf": 91.2},
+    "DoS Slowhttptest":         {"tactic": "TA0040 Impact", "technique": "T1499", "conf": 90.8},
+    "Hulk":                     {"tactic": "TA0040 Impact", "technique": "T1498.001", "conf": 94.0},
+    "GoldenEye":                {"tactic": "TA0040 Impact", "technique": "T1498/T1499", "conf": 93.5},
+    "Slowloris":                {"tactic": "TA0040 Impact", "technique": "T1499", "conf": 91.2},
+    "Slowhttptest":             {"tactic": "TA0040 Impact", "technique": "T1499", "conf": 90.8},
+
+    # Reconnaissance & Discovery (TA0043 / TA0007)
+    "PortScan":                 {"tactic": "TA0043 Reconnaissance", "technique": "T1046", "conf": 92.5},
+    "IP Sweep":                 {"tactic": "TA0007 Discovery", "technique": "T1046", "conf": 90.0},
+
+    # Credential Access (TA0006)
+    "FTP-Patator":              {"tactic": "TA0006 Credential Access", "technique": "T1110.001", "conf": 95.0},
+    "SSH-Patator":              {"tactic": "TA0006 Credential Access", "technique": "T1110.001", "conf": 95.5},
+    "Brute Force":              {"tactic": "TA0006 Credential Access", "technique": "T1110", "conf": 94.0},
+
+    # Initial Access (TA0001)
+    "Web Attack - SQL Injection": {"tactic": "TA0001 Initial Access", "technique": "T1190", "conf": 94.5},
+    "Web Attack - XSS":           {"tactic": "TA0001 Initial Access", "technique": "T1190", "conf": 93.0},
+    "Web Attack - Brute Force":   {"tactic": "TA0001 Initial Access", "technique": "T1190", "conf": 92.0},
+    "SQL Injection":              {"tactic": "TA0001 Initial Access", "technique": "T1190", "conf": 94.5},
+    "XSS":                        {"tactic": "TA0001 Initial Access", "technique": "T1190", "conf": 93.0},
+
+    # Command & Control (TA0011)
+    "Bot":                      {"tactic": "TA0011 Command & Control", "technique": "T1071.001", "conf": 91.5},
+    "ARES Botnet":              {"tactic": "TA0011 Command & Control", "technique": "T1071", "conf": 92.0},
+    "Mirai":                    {"tactic": "TA0011 Command & Control", "technique": "T1071", "conf": 93.0},
+
+    # Exfiltration / Infiltration (TA0010)
+    "Infiltration":             {"tactic": "TA0010 Exfiltration", "technique": "T1041", "conf": 90.0},
+    "Data Exfiltration":        {"tactic": "TA0010 Exfiltration", "technique": "T1041", "conf": 91.0},
 }
 
 def map_to_mitre(attack_label):

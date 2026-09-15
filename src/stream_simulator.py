@@ -88,7 +88,7 @@ def run_stream(delay_seconds=2, max_events=None):
             # Compute LIME explanation (using num_samples=1000 for low stream latency impact)
             lime_exp = explain_alert_lime(lime_explainer, predict_proba_fn, X[i], num_features=5, num_samples=1000)
 
-            mitre = map_to_mitre(label.replace('DoS ', '') if 'DoS' in str(label) else label) or \
+            mitre = map_to_mitre(label) or map_to_mitre(label.replace('DoS ', '')) or \
                     {"tactic": "TA0040 Impact", "technique": "T1499", "conf": 85.0}
 
             alert_row = {

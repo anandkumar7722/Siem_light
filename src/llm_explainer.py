@@ -52,7 +52,25 @@ def generate_llm_explanation(alert_data):
     # Rule-based natural language template engine fallback (0-cost, instant, offline)
     shap_primary = alert_data.get('shap_feat_1', 'Flow Features')
     lime_primary = alert_data.get('lime_feat_1', 'Traffic Pattern')
-    
+    tactic = str(alert_data.get('mitre_tactic', ''))
+    label = str(alert_data.get('label', ''))
+    src_ip = alert_data.get('source_ip', 'N/A')
+    dst_ip = alert_data.get('destination_ip', 'N/A')
+    ts = alert_data.get('timestamp', 'N/A')
+
+    if "TA0043" in tactic or "Reconnaissance" in tactic or "PortScan" in label:
+        rec_action = f"Block scanning IP `{src_ip}` at border firewall, inspect port probe logs around `{ts}`, and restrict exposed internal management services."
+    elif "TA0006" in tactic or "Patator" in label or "Brute Force" in label:
+        rec_action = f"Enforce immediate account lockouts for target users, isolate source IP `{src_ip}`, enforce MFA, and audit SSH/FTP authentication logs around `{ts}`."
+    elif "TA0001" in tactic or "Web Attack" in label:
+        rec_action = f"Inspect Web Application Firewall (WAF) logs around `{ts}`, block attacking IP `{src_ip}`, and validate input sanitization on public endpoints."
+    elif "TA0011" in tactic or "Bot" in label:
+        rec_action = f"Isolate infected host `{src_ip}`, terminate C2 communication channels to `{dst_ip}`, and initiate host-based EDR malware remediation."
+    elif "TA0010" in tactic or "Exfiltration" in tactic or "Infiltration" in label:
+        rec_action = f"Isolate host `{src_ip}`, audit egress data volumes to `{dst_ip}` around `{ts}`, and revoke associated session credentials."
+    else:
+        rec_action = f"Isolate host IP `{src_ip}`, inspect flow logs around `{ts}`, and verify firewall filtering rules for `{dst_ip}`."
+
     narrative = f"""
 ### 🤖 AI Analyst Summary
 
@@ -65,7 +83,7 @@ Alert #{alert_data.get('alert_id')} triggered a **{alert_data.get('severity')}**
 - **Consensus Assessment:** Dual alignment between global model attributions and local surrogate weights confirms high-confidence anomaly classification, ruling out random packet noise.
 
 **3. Recommended Action:**  
-Isolate host IP `{alert_data.get('source_ip')}`, inspect flow logs around `{alert_data.get('timestamp')}`, and verify firewall filtering rules for `{alert_data.get('destination_ip')}`.
+{rec_action}
 """
     return narrative
 
