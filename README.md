@@ -60,6 +60,9 @@ docker build -t siem_light .
 
 # Run the container
 docker run -d -p 8501:8501 --name siem_dashboard siem_light
+#option
+docker compose up -d --build
+
 ```
 
 Access the dashboard at **[http://localhost:8501](http://localhost:8501)**.
